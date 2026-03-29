@@ -33,16 +33,20 @@ const AdminLoginPage = () => {
           <p>Book Kingdom Control Panel</p>
         </div>
         {error && <p className="admin-login-error">{error}</p>}
-        <label>Email address</label>
+        <label htmlFor="admin-email">Email address</label>
         <input
+          id="admin-email"
+          name="email"
           type="email"
           autoComplete="email"
           value={form.email}
           onChange={(event) => setForm({ ...form, email: event.target.value })}
           required
         />
-        <label>Password</label>
+        <label htmlFor="admin-password">Password</label>
         <input
+          id="admin-password"
+          name="password"
           type="password"
           autoComplete="current-password"
           value={form.password}

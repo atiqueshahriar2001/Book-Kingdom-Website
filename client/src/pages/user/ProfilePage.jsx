@@ -90,7 +90,7 @@ const ProfilePage = () => {
       <div className="split-layout">
         <form className="form-card" onSubmit={saveProfile}>
           <h2>Personal Information</h2>
-          <label>Profile Photo</label>
+          <label htmlFor="profile-photo">Profile Photo</label>
           <div className="photo-upload-area" onClick={() => fileRef.current?.click()}>
             {photoPreview ? (
               <img src={photoPreview} alt="Profile" className="photo-preview" />
@@ -106,25 +106,33 @@ const ProfilePage = () => {
           </div>
           <input
             ref={fileRef}
+            id="profile-photo"
+            name="profilePhoto"
             type="file"
             accept="image/jpeg,image/png,image/webp,image/gif"
             style={{ display: "none" }}
             onChange={handlePhotoChange}
           />
-          <label>Full name</label>
+          <label htmlFor="profile-name">Full name</label>
           <input
+            id="profile-name"
+            name="name"
             placeholder="Your name"
             value={form.name}
             onChange={(event) => setForm({ ...form, name: event.target.value })}
           />
-          <label>Phone number</label>
+          <label htmlFor="profile-phone">Phone number</label>
           <input
+            id="profile-phone"
+            name="phone"
             placeholder="Your phone"
             value={form.phone}
             onChange={(event) => setForm({ ...form, phone: event.target.value })}
           />
-          <label>Address</label>
+          <label htmlFor="profile-address">Address</label>
           <textarea
+            id="profile-address"
+            name="address"
             rows="4"
             placeholder="Your address"
             value={form.address}
@@ -134,8 +142,10 @@ const ProfilePage = () => {
         </form>
         <form className="form-card" onSubmit={changePassword}>
           <h2>Change Password</h2>
-          <label>Current password</label>
+          <label htmlFor="current-password">Current password</label>
           <input
+            id="current-password"
+            name="currentPassword"
             type="password"
             autoComplete="current-password"
             placeholder="Enter current password"
@@ -144,8 +154,10 @@ const ProfilePage = () => {
               setPasswords({ ...passwords, currentPassword: event.target.value })
             }
           />
-          <label>New password</label>
+          <label htmlFor="new-password">New password</label>
           <input
+            id="new-password"
+            name="newPassword"
             type="password"
             autoComplete="new-password"
             placeholder="Enter new password"

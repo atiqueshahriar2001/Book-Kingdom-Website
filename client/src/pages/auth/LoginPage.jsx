@@ -28,15 +28,19 @@ const LoginPage = () => {
         <p className="eyebrow">Welcome back</p>
         <h1>Sign in to your account</h1>
         {error && <p className="error-text">{error}</p>}
-        <label>Email address</label>
+        <label htmlFor="login-email">Email address</label>
         <input
+          id="login-email"
+          name="email"
           type="email"
           autoComplete="email"
           value={form.email}
           onChange={(event) => setForm({ ...form, email: event.target.value })}
         />
-        <label>Password</label>
+        <label htmlFor="login-password">Password</label>
         <input
+          id="login-password"
+          name="password"
           type="password"
           autoComplete="current-password"
           value={form.password}

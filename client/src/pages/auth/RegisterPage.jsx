@@ -30,23 +30,30 @@ const RegisterPage = () => {
         <p className="eyebrow">Get started</p>
         <h1>Create your account</h1>
         {error && <p className="error-text">{error}</p>}
-        <label>Full name</label>
+        <label htmlFor="register-name">Full name</label>
         <input
+          id="register-name"
+          name="name"
           type="text"
+          autoComplete="name"
           value={form.name}
           onChange={(event) => setForm({ ...form, name: event.target.value })}
           required
         />
-        <label>Email address</label>
+        <label htmlFor="register-email">Email address</label>
         <input
+          id="register-email"
+          name="email"
           type="email"
           autoComplete="email"
           value={form.email}
           onChange={(event) => setForm({ ...form, email: event.target.value })}
           required
         />
-        <label>Password</label>
+        <label htmlFor="register-password">Password</label>
         <input
+          id="register-password"
+          name="password"
           type="password"
           autoComplete="new-password"
           value={form.password}
