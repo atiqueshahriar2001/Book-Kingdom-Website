@@ -23,7 +23,10 @@ import UserDashboardPage from "./pages/user/UserDashboardPage.jsx";
 
 const AdminRoute = ({ children }) => {
   const { user } = useAuth();
-  if (user?.role === "admin") return <Navigate to="/admin" replace />;
+  const location = useLocation();
+  if (user?.role === "admin" && (location.pathname === "/login" || location.pathname === "/register")) {
+    return <Navigate to="/admin" replace />;
+  }
   return children;
 };
 
@@ -38,9 +41,9 @@ const App = () => {
       {!isAdminPage && !isAdmin && <Header />}
       <main className="main-shell">
         <Routes>
-          <Route path="/" element={<AdminRoute><HomePage /></AdminRoute>} />
-          <Route path="/books" element={<AdminRoute><BooksPage /></AdminRoute>} />
-          <Route path="/books/:id" element={<AdminRoute><BookDetailsPage /></AdminRoute>} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/books" element={<BooksPage />} />
+          <Route path="/books/:id" element={<BookDetailsPage />} />
           <Route path="/login" element={<AdminRoute><LoginPage /></AdminRoute>} />
           <Route path="/register" element={<AdminRoute><RegisterPage /></AdminRoute>} />
           <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />

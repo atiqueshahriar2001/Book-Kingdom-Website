@@ -7,7 +7,7 @@ const CartPage = () => {
   const { profile, loadProfile } = useAuth();
   const cart = profile?.cart || [];
   const [error, setError] = useState("");
-  const total = cart.reduce((sum, item) => sum + item.book.price * item.quantity, 0);
+  const total = cart.reduce((sum, item) => sum + (item.book?.price || 0) * item.quantity, 0);
 
   const updateQuantity = async (bookId, quantity) => {
     setError("");
@@ -36,7 +36,7 @@ const CartPage = () => {
       ) : (
         <>
           <div className="stack">
-            {cart.map((item) => (
+            {cart.filter((item) => item.book).map((item) => (
               <article className="list-card" key={item.book._id}>
                 <div>
                   <strong>{item.book.title}</strong>

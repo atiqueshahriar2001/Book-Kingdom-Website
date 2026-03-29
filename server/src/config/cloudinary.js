@@ -3,7 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
 
 if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
-  console.error("Missing Cloudinary environment variables. Image uploads will not work.");
+  throw new Error("Missing Cloudinary environment variables. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.");
 }
 
 cloudinary.config({

@@ -5,7 +5,15 @@ import Dropdown from "../../components/ui/Dropdown.jsx";
 const AdminOrdersPage = () => {
   const [orders, setOrders] = useState([]);
 
-  const loadOrders = () => apiRequest("/admin/orders").then((data) => setOrders(data.orders));
+  const [error, setError] = useState("");
+
+  const loadOrders = () =>
+    apiRequest("/admin/orders")
+      .then((data) => {
+        setOrders(data.orders);
+        setError("");
+      })
+      .catch((err) => setError(err.message));
 
   useEffect(() => {
     loadOrders();
@@ -27,6 +35,7 @@ const AdminOrdersPage = () => {
           <h1>Manage Orders</h1>
         </div>
       </div>
+      {error && <p className="error-text">{error}</p>}
       {orders.length === 0 ? (
         <p className="loading-state">No orders to display.</p>
       ) : (
@@ -42,6 +51,7 @@ const AdminOrdersPage = () => {
                   <option value="Pending">Pending</option>
                   <option value="Shipped">Shipped</option>
                   <option value="Delivered">Delivered</option>
+                  <option value="Cancelled">Cancelled</option>
                 </Dropdown>
                 <strong>Tk {order.totalPrice}</strong>
               </div>

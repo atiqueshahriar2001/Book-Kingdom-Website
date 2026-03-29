@@ -31,9 +31,10 @@ export const getAdminBooks = asyncHandler(async (req, res) => {
 
   const query = {};
   if (search) {
+    const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     query.$or = [
-      { title: { $regex: search, $options: "i" } },
-      { author: { $regex: search, $options: "i" } }
+      { title: { $regex: escaped, $options: "i" } },
+      { author: { $regex: escaped, $options: "i" } }
     ];
   }
 
@@ -108,9 +109,10 @@ export const getUsers = asyncHandler(async (req, res) => {
 
   const query = {};
   if (search) {
+    const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     query.$or = [
-      { name: { $regex: search, $options: "i" } },
-      { email: { $regex: search, $options: "i" } }
+      { name: { $regex: escaped, $options: "i" } },
+      { email: { $regex: escaped, $options: "i" } }
     ];
   }
   if (role && ["user", "admin"].includes(role)) {

@@ -12,12 +12,17 @@ export const apiRequest = async (path, options = {}) => {
     ...options
   });
 
-  const data = await response.json().catch(() => ({}));
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    data = {};
+  }
 
   if (response.status === 401 && token) {
     localStorage.removeItem("book-kingdom-token");
     localStorage.removeItem("book-kingdom-user");
-    window.location.href = "/login";
+    window.dispatchEvent(new Event("auth:expired"));
     throw new Error("Session expired. Please log in again.");
   }
 

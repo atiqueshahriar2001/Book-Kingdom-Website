@@ -18,9 +18,10 @@ export const getBooks = asyncHandler(async (req, res) => {
   };
 
   if (search) {
+    const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     query.$or = [
-      { title: { $regex: search, $options: "i" } },
-      { author: { $regex: search, $options: "i" } }
+      { title: { $regex: escaped, $options: "i" } },
+      { author: { $regex: escaped, $options: "i" } }
     ];
   }
 

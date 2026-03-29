@@ -65,7 +65,16 @@ export const AuthProvider = ({ children }) => {
     if (user) {
       loadProfile();
     }
-  }, [user?. _id]);
+  }, [user?._id]);
+
+  useEffect(() => {
+    const handleExpired = () => {
+      setUser(null);
+      setProfile(null);
+    };
+    window.addEventListener("auth:expired", handleExpired);
+    return () => window.removeEventListener("auth:expired", handleExpired);
+  }, []);
 
   const value = useMemo(
     () => ({ user, profile, loading, login, register, logout, loadProfile, setProfile }),
