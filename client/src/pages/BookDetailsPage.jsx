@@ -88,6 +88,8 @@ const BookDetailsPage = () => {
               <h3>Write a Review</h3>
               <label>Rating</label>
               <Dropdown
+                id="review-rating"
+                name="rating"
                 value={form.rating}
                 onChange={(event) => setForm({ ...form, rating: Number(event.target.value) })}
               >
@@ -95,8 +97,10 @@ const BookDetailsPage = () => {
                   <option key={value} value={value}>{value} star{value > 1 ? "s" : ""}</option>
                 ))}
               </Dropdown>
-              <label>Your review</label>
+              <label htmlFor="review-comment">Your review</label>
               <textarea
+                id="review-comment"
+                name="comment"
                 rows="4"
                 placeholder="Share your thoughts about this book..."
                 value={form.comment}

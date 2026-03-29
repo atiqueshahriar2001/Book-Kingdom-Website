@@ -44,6 +44,8 @@ const CartPage = () => {
                 </div>
                 <div className="inline-actions">
                   <input
+                    id={`cart-quantity-${item.book._id}`}
+                    name={`quantity-${item.book._id}`}
                     type="number"
                     min="1"
                     value={item.quantity}

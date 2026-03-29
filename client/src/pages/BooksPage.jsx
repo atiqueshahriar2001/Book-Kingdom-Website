@@ -82,11 +82,15 @@ const BooksPage = () => {
       </div>
       <form className="filter-bar" onSubmit={submitFilters}>
         <input
+          id="book-search"
+          name="search"
           placeholder="Search title or author"
           value={filters.search}
           onChange={(event) => setFilters({ ...filters, search: event.target.value })}
         />
         <Dropdown
+          id="book-category"
+          name="category"
           value={filters.category}
           onChange={(event) => setFilters({ ...filters, category: event.target.value })}
         >
@@ -96,18 +100,24 @@ const BooksPage = () => {
           <option>ইসলামিক</option>
         </Dropdown>
         <input
+          id="book-min-price"
+          name="minPrice"
           type="number"
           placeholder="Min price"
           value={filters.minPrice}
           onChange={(event) => setFilters({ ...filters, minPrice: Number(event.target.value) })}
         />
         <input
+          id="book-max-price"
+          name="maxPrice"
           type="number"
           placeholder="Max price"
           value={filters.maxPrice}
           onChange={(event) => setFilters({ ...filters, maxPrice: Number(event.target.value) })}
         />
         <Dropdown
+          id="book-rating"
+          name="rating"
           value={filters.rating}
           onChange={(event) => setFilters({ ...filters, rating: event.target.value })}
         >
