@@ -1,0 +1,94 @@
+# ========================
+# Dependencies
+# ========================
+node_modules/
+.pnpm-store/
+
+# ========================
+# Build Output
+# ========================
+client/dist/
+
+# ========================
+# Environment Variables
+# ========================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+client/.env
+server/.env
+
+# ========================
+# Logs
+# ========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ========================
+# Vite Cache
+# ========================
+client/.vite/
+
+# ========================
+# Uploads / Temp (Multer)
+# ========================
+uploads/
+tmp/
+
+# ========================
+# MongoDB Local Data
+# ========================
+data/
+db/
+
+# ========================
+# OS Files
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+._*
+
+# ========================
+# Editor / IDE
+# ========================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*~
+*.sublime-workspace
+*.sublime-project
+
+# ========================
+# Testing / Coverage
+# ========================
+coverage/
+.nyc_output/
+
+# ========================
+# Runtime / PID
+# ========================
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ========================
+# Misc
+# ========================
+.cache/
+*.tgz
+*.bak
+*.tmp
