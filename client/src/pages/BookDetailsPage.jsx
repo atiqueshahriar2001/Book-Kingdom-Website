@@ -73,7 +73,7 @@ const BookDetailsPage = () => {
           <p className="eyebrow">{book.category}</p>
           <h1>{book.title}</h1>
           <p className="book-author">by {book.author}</p>
-          <p style={{ color: "var(--ink-secondary)", lineHeight: 1.7 }}>{book.description}</p>
+          <p className="description-display" style={{ color: "var(--ink-secondary)", lineHeight: 1.7 }}>{book.description}</p>
           <div className="detail-stats">
             <strong>Tk {book.price}</strong>
             <span>★ {(book.rating || 0).toFixed(1)} / 5</span>

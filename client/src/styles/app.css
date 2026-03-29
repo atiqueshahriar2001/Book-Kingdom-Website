@@ -722,6 +722,19 @@ button:not(.primary-button):not(.secondary-button):not(.ghost-button):not(.hambu
   color: var(--ink);
   transition: all 0.15s ease;
   outline: none;
+  box-sizing: border-box;
+}
+
+.form-card textarea,
+.review-form textarea {
+  resize: none;
+  height: 120px;
+}
+
+.form-card .description-display {
+  max-height: 200px;
+  overflow-y: auto;
+  resize: none;
 }
 
 .filter-bar input:focus,
