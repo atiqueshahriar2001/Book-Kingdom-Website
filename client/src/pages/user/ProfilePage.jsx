@@ -137,6 +137,7 @@ const ProfilePage = () => {
           <label>Current password</label>
           <input
             type="password"
+            autoComplete="current-password"
             placeholder="Enter current password"
             value={passwords.currentPassword}
             onChange={(event) =>
@@ -146,6 +147,7 @@ const ProfilePage = () => {
           <label>New password</label>
           <input
             type="password"
+            autoComplete="new-password"
             placeholder="Enter new password"
             value={passwords.newPassword}
             onChange={(event) =>

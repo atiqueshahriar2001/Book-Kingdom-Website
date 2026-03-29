@@ -40,6 +40,7 @@ const RegisterPage = () => {
         <label>Email address</label>
         <input
           type="email"
+          autoComplete="email"
           value={form.email}
           onChange={(event) => setForm({ ...form, email: event.target.value })}
           required
@@ -47,6 +48,7 @@ const RegisterPage = () => {
         <label>Password</label>
         <input
           type="password"
+          autoComplete="new-password"
           value={form.password}
           onChange={(event) => setForm({ ...form, password: event.target.value })}
           required

@@ -31,12 +31,14 @@ const LoginPage = () => {
         <label>Email address</label>
         <input
           type="email"
+          autoComplete="email"
           value={form.email}
           onChange={(event) => setForm({ ...form, email: event.target.value })}
         />
         <label>Password</label>
         <input
           type="password"
+          autoComplete="current-password"
           value={form.password}
           onChange={(event) => setForm({ ...form, password: event.target.value })}
         />
