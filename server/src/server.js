@@ -1,15 +1,20 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = "development";
+}
+
 const { default: app } = await import("./app.js");
 const { default: connectDB } = await import("./config/db.js");
 
 const port = process.env.PORT || 5000;
+const isProduction = process.env.NODE_ENV === "production";
 
 const start = async () => {
   await connectDB();
   const server = app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`Server running on port ${port} [${isProduction ? "production" : "development"}]`);
   });
 
   const shutdown = () => {

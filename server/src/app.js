@@ -10,6 +10,10 @@ import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 
 const app = express();
 
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 const allowedOrigins = [
   "https://bookkingdom.netlify.app",
   "http://localhost:5173",
