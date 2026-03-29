@@ -105,6 +105,7 @@ const BookDetailsPage = () => {
                 placeholder="Share your thoughts about this book..."
                 value={form.comment}
                 onChange={(event) => setForm({ ...form, comment: event.target.value })}
+                autoComplete="off"
               />
               <button className="primary-button" type="submit">Submit Review</button>
             </form>

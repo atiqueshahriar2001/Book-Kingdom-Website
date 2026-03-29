@@ -87,6 +87,7 @@ const BooksPage = () => {
           placeholder="Search title or author"
           value={filters.search}
           onChange={(event) => setFilters({ ...filters, search: event.target.value })}
+          autoComplete="off"
         />
         <Dropdown
           id="book-category"
@@ -106,6 +107,7 @@ const BooksPage = () => {
           placeholder="Min price"
           value={filters.minPrice}
           onChange={(event) => setFilters({ ...filters, minPrice: Number(event.target.value) })}
+          autoComplete="off"
         />
         <input
           id="book-max-price"
@@ -114,6 +116,7 @@ const BooksPage = () => {
           placeholder="Max price"
           value={filters.maxPrice}
           onChange={(event) => setFilters({ ...filters, maxPrice: Number(event.target.value) })}
+          autoComplete="off"
         />
         <Dropdown
           id="book-rating"

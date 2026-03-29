@@ -123,11 +123,11 @@ const AdminBooksPage = () => {
         <form className="form-card" onSubmit={submitBook}>
           <h2>{editingId ? "Edit Book" : "Add New Book"}</h2>
           <label htmlFor="book-title">Title</label>
-          <input id="book-title" name="title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+          <input id="book-title" name="title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required autoComplete="off" />
           <label htmlFor="book-author">Author</label>
-          <input id="book-author" name="author" value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })} required />
+          <input id="book-author" name="author" value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })} required autoComplete="off" />
           <label htmlFor="book-category">Category</label>
-          <input id="book-category" name="category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required />
+          <input id="book-category" name="category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required autoComplete="off" />
           <label htmlFor="book-image">Book Cover Image</label>
           <div className="photo-upload-area" onClick={() => imageRef.current?.click()}>
             {imagePreview ? (
@@ -153,11 +153,11 @@ const AdminBooksPage = () => {
             onChange={handleImageChange}
           />
           <label htmlFor="book-price">Price (Tk)</label>
-          <input id="book-price" name="price" type="number" value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} required min="0" />
+          <input id="book-price" name="price" type="number" value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} required min="0" autoComplete="off" />
           <label htmlFor="book-stock">Stock Quantity</label>
-          <input id="book-stock" name="countInStock" type="number" value={form.countInStock} onChange={(e) => setForm({ ...form, countInStock: Number(e.target.value) })} min="0" />
+          <input id="book-stock" name="countInStock" type="number" value={form.countInStock} onChange={(e) => setForm({ ...form, countInStock: Number(e.target.value) })} min="0" autoComplete="off" />
           <label htmlFor="book-description">Description</label>
-          <textarea id="book-description" name="description" rows="5" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
+          <textarea id="book-description" name="description" rows="5" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required autoComplete="off" />
           <label className="checkbox-line">
             <input id="book-featured" name="featured" type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
             Featured book

@@ -68,7 +68,7 @@ const CheckoutPage = () => {
               id={`checkout-${key}`}
               name={key}
               type={key === "phone" ? "tel" : "text"}
-              autoComplete={fieldAutocomplete[key] || "off"}
+              autoComplete={fieldAutocomplete[key] ?? "off"}
               placeholder={fieldLabels[key] || key}
               value={form[key]}
               onChange={(event) => setForm({ ...form, [key]: event.target.value })}

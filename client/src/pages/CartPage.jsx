@@ -51,6 +51,7 @@ const CartPage = () => {
                     value={item.quantity}
                     onChange={(event) => updateQuantity(item.book._id, event.target.value)}
                     style={{ width: "80px" }}
+                    autoComplete="off"
                   />
                 </div>
               </article>
