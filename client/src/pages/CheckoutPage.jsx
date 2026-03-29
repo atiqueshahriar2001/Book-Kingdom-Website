@@ -42,6 +42,15 @@ const CheckoutPage = () => {
     country: "Country"
   };
 
+  const fieldAutocomplete = {
+    fullName: "name",
+    phone: "tel",
+    address: "street-address",
+    city: "address-level2",
+    postalCode: "postal-code",
+    country: "country"
+  };
+
   return (
     <div className="container section">
       <div className="section-heading">
@@ -54,8 +63,12 @@ const CheckoutPage = () => {
       <form className="form-card" onSubmit={submitOrder} style={{ maxWidth: "600px" }}>
         {Object.keys(form).map((key) => (
           <div key={key}>
-            <label>{fieldLabels[key] || key}</label>
+            <label htmlFor={`checkout-${key}`}>{fieldLabels[key] || key}</label>
             <input
+              id={`checkout-${key}`}
+              name={key}
+              type={key === "phone" ? "tel" : "text"}
+              autoComplete={fieldAutocomplete[key] || "off"}
               placeholder={fieldLabels[key] || key}
               value={form[key]}
               onChange={(event) => setForm({ ...form, [key]: event.target.value })}

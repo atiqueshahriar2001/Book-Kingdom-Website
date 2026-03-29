@@ -117,6 +117,8 @@ const ProfilePage = () => {
           <input
             id="profile-name"
             name="name"
+            type="text"
+            autoComplete="name"
             placeholder="Your name"
             value={form.name}
             onChange={(event) => setForm({ ...form, name: event.target.value })}
@@ -125,6 +127,8 @@ const ProfilePage = () => {
           <input
             id="profile-phone"
             name="phone"
+            type="tel"
+            autoComplete="tel"
             placeholder="Your phone"
             value={form.phone}
             onChange={(event) => setForm({ ...form, phone: event.target.value })}
@@ -133,6 +137,7 @@ const ProfilePage = () => {
           <textarea
             id="profile-address"
             name="address"
+            autoComplete="street-address"
             rows="4"
             placeholder="Your address"
             value={form.address}
