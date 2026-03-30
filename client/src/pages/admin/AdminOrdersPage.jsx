@@ -20,11 +20,15 @@ const AdminOrdersPage = () => {
   }, []);
 
   const updateStatus = async (id, status) => {
-    await apiRequest(`/admin/orders/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({ status })
-    });
-    await loadOrders();
+    try {
+      await apiRequest(`/admin/orders/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ status })
+      });
+      await loadOrders();
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { apiRequest } from "../api/client.js";
 
 const AuthContext = createContext(null);
@@ -15,38 +15,38 @@ export const AuthProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const persistAuth = (payload) => {
+  const persistAuth = useCallback((payload) => {
     localStorage.setItem("book-kingdom-token", payload.token);
     localStorage.setItem("book-kingdom-user", JSON.stringify(payload.user));
     setUser(payload.user);
-  };
+  }, []);
 
-  const login = async (values) => {
+  const login = useCallback(async (values) => {
     const data = await apiRequest("/auth/login", {
       method: "POST",
       body: JSON.stringify(values)
     });
     persistAuth(data);
     return data;
-  };
+  }, [persistAuth]);
 
-  const register = async (values) => {
+  const register = useCallback(async (values) => {
     const data = await apiRequest("/auth/register", {
       method: "POST",
       body: JSON.stringify(values)
     });
     persistAuth(data);
     return data;
-  };
+  }, [persistAuth]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("book-kingdom-token");
     localStorage.removeItem("book-kingdom-user");
     setUser(null);
     setProfile(null);
-  };
+  }, []);
 
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     if (!user) return null;
     setLoading(true);
     try {
@@ -59,12 +59,15 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, logout]);
 
   useEffect(() => {
-    if (user) {
-      loadProfile();
-    }
+    if (!user) return;
+    setLoading(true);
+    apiRequest("/users/profile")
+      .then((data) => setProfile(data))
+      .catch(() => logout())
+      .finally(() => setLoading(false));
   }, [user?._id]);
 
   useEffect(() => {

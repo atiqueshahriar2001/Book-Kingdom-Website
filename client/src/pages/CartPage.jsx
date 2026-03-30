@@ -53,6 +53,7 @@ const CartPage = () => {
                     style={{ width: "80px" }}
                     autoComplete="off"
                   />
+                  <button onClick={() => updateQuantity(item.book._id, 0)}>Remove</button>
                 </div>
               </article>
             ))}

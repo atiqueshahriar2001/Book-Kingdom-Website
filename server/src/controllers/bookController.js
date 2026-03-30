@@ -5,17 +5,19 @@ export const getBooks = asyncHandler(async (req, res) => {
   const {
     search = "",
     category,
-    minPrice = 0,
-    maxPrice = Number.MAX_SAFE_INTEGER,
     rating,
     featured,
     page = 1,
     limit = 8
   } = req.query;
 
-  const query = {
-    price: { $gte: Number(minPrice), $lte: Number(maxPrice) }
-  };
+  const query = {};
+
+  if (req.query.minPrice !== undefined || req.query.maxPrice !== undefined) {
+    query.price = {};
+    if (req.query.minPrice !== undefined) query.price.$gte = Number(req.query.minPrice);
+    if (req.query.maxPrice !== undefined) query.price.$lte = Number(req.query.maxPrice);
+  }
 
   if (search) {
     const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

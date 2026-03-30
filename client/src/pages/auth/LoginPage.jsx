@@ -36,6 +36,7 @@ const LoginPage = () => {
           autoComplete="email"
           value={form.email}
           onChange={(event) => setForm({ ...form, email: event.target.value })}
+          required
         />
         <label htmlFor="login-password">Password</label>
         <input
@@ -45,6 +46,7 @@ const LoginPage = () => {
           autoComplete="current-password"
           value={form.password}
           onChange={(event) => setForm({ ...form, password: event.target.value })}
+          required
         />
         <button className="primary-button" type="submit">Sign In</button>
         <p>

@@ -28,12 +28,13 @@ export const registerUser = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Please provide a valid email address" });
   }
 
-  const existingUser = await User.findOne({ email: email.toLowerCase() });
+  const normalizedEmail = email.toLowerCase();
+  const existingUser = await User.findOne({ email: normalizedEmail });
   if (existingUser) {
     return res.status(400).json({ message: "User already exists" });
   }
 
-  const user = await User.create({ name, email, password });
+  const user = await User.create({ name, email: normalizedEmail, password });
 
   return res.status(201).json({
     token: generateToken(user._id),
@@ -48,7 +49,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Email and password are required" });
   }
 
-  const user = await User.findOne({ email: email.toLowerCase() }).select("+role");
+  const user = await User.findOne({ email: email.toLowerCase() }).select("+password +role");
 
   if (!user || !(await user.matchPassword(password))) {
     return res.status(401).json({ message: "Invalid email or password" });

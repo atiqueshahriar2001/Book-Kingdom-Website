@@ -121,10 +121,10 @@ const UserDashboardPage = () => {
                   })}</p>
                 </div>
                 <div className="inline-actions">
-                  <span className={`status-badge status-${order.status?.toLowerCase() === "delivered" ? "delivered" : order.status?.toLowerCase() === "shipped" ? "shipped" : "pending"}`}>
+                  <span className={`status-badge status-${order.status?.toLowerCase() === "delivered" ? "delivered" : order.status?.toLowerCase() === "shipped" ? "shipped" : order.status?.toLowerCase() === "cancelled" ? "cancelled" : "pending"}`}>
                     {order.status}
                   </span>
-                  <strong>Tk {order.totalPrice}</strong>
+                  <strong>Tk {(order.totalPrice ?? 0).toLocaleString()}</strong>
                 </div>
               </article>
             ))}

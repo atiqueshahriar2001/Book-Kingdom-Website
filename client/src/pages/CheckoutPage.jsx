@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../api/client.js";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
+  const { loadProfile } = useAuth();
   const [form, setForm] = useState({
     fullName: "",
     phone: "",
@@ -25,6 +27,7 @@ const CheckoutPage = () => {
         method: "POST",
         body: JSON.stringify({ shippingAddress: form, paymentMethod: "Cash on Delivery" })
       });
+      await loadProfile();
       navigate("/orders");
     } catch (err) {
       setError(err.message);

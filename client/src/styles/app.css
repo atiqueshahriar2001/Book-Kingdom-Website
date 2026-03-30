@@ -303,11 +303,12 @@ button:not(.primary-button):not(.secondary-button):not(.ghost-button):not(.hambu
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1fr;
   gap: 3rem;
   align-items: center;
   position: relative;
   z-index: 1;
+  max-width: 700px;
 }
 
 .hero-grid > div:first-child {
@@ -1172,6 +1173,11 @@ button:not(.primary-button):not(.secondary-button):not(.ghost-button):not(.hambu
 .status-delivered {
   background: rgba(5, 150, 105, 0.1);
   color: var(--success);
+}
+
+.status-cancelled {
+  background: rgba(220, 38, 38, 0.1);
+  color: var(--danger);
 }
 
 /* ── Footer ─────────────────────────────────────── */

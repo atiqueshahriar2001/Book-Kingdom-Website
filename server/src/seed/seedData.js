@@ -18,6 +18,10 @@ const seed = async () => {
     process.exit(0);
   }
 
+  if (!process.env.SEED_ADMIN_PASSWORD) {
+    console.warn("WARNING: SEED_ADMIN_PASSWORD not set. Using default password. Change it immediately.");
+  }
+
   await User.create({
     name: "Admin",
     email: process.env.SEED_ADMIN_EMAIL || "admin@bookkingdom.com",

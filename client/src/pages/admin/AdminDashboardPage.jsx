@@ -77,7 +77,7 @@ const AdminDashboardPage = () => {
             </svg>
           </div>
           <div>
-            <strong>Tk {stats.revenue?.toLocaleString()}</strong>
+            <strong>Tk {(stats.revenue ?? 0).toLocaleString()}</strong>
             <span>Total Revenue</span>
           </div>
         </div>
@@ -108,11 +108,11 @@ const AdminDashboardPage = () => {
                       <td><span className="admin-id">#{order._id.slice(-6).toUpperCase()}</span></td>
                       <td>{order.user?.name || "N/A"}</td>
                       <td>
-                        <span className={`status-badge status-${order.status?.toLowerCase() === "delivered" ? "delivered" : order.status?.toLowerCase() === "shipped" ? "shipped" : "pending"}`}>
+                        <span className={`status-badge status-${order.status?.toLowerCase() === "delivered" ? "delivered" : order.status?.toLowerCase() === "shipped" ? "shipped" : order.status?.toLowerCase() === "cancelled" ? "cancelled" : "pending"}`}>
                           {order.status}
                         </span>
                       </td>
-                      <td><strong>Tk {order.totalPrice}</strong></td>
+                      <td><strong>Tk {(order.totalPrice ?? 0).toLocaleString()}</strong></td>
                     </tr>
                   ))}
                 </tbody>

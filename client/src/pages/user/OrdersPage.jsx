@@ -5,6 +5,7 @@ const statusClass = (status) => {
   const s = status?.toLowerCase();
   if (s === "delivered") return "status-badge status-delivered";
   if (s === "shipped") return "status-badge status-shipped";
+  if (s === "cancelled") return "status-badge status-cancelled";
   return "status-badge status-pending";
 };
 
@@ -53,7 +54,7 @@ const OrdersPage = () => {
               </div>
               <div className="inline-actions">
                 <span className={statusClass(order.status)}>{order.status}</span>
-                <strong>Tk {order.totalPrice.toLocaleString()}</strong>
+                <strong>Tk {(order.totalPrice ?? 0).toLocaleString()}</strong>
               </div>
             </article>
           ))}

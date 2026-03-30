@@ -43,7 +43,7 @@ const BooksPage = () => {
     setLoading(true);
     setError("");
     apiRequest(`/books?${params.toString()}`)
-      .then((result) => setData(result))
+      .then((result) => setData(result || { books: [], pages: 1, page: 1 }))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [categoryParam]);

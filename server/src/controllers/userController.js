@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import User from "../models/User.js";
+import Book from "../models/Book.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 export const getProfile = asyncHandler(async (req, res) => {
@@ -31,7 +32,8 @@ export const updateProfile = asyncHandler(async (req, res) => {
   }
 
   await user.save();
-  return res.json({ message: "Profile updated", profilePhoto: user.profilePhoto });
+  const updated = await User.findById(req.user._id).select("-password +role");
+  return res.json({ message: "Profile updated", user: updated });
 });
 
 export const changePassword = asyncHandler(async (req, res) => {
@@ -45,7 +47,7 @@ export const changePassword = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "New password must be at least 6 characters" });
   }
 
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user._id).select("+password");
 
   if (!(await user.matchPassword(currentPassword))) {
     return res.status(400).json({ message: "Current password is incorrect" });
@@ -61,6 +63,11 @@ export const toggleWishlist = asyncHandler(async (req, res) => {
 
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
     return res.status(400).json({ message: "Invalid book ID" });
+  }
+
+  const book = await Book.findById(bookId);
+  if (!book) {
+    return res.status(404).json({ message: "Book not found" });
   }
 
   const user = await User.findById(req.user._id);

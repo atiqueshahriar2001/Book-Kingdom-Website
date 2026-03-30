@@ -12,17 +12,18 @@ const BookDetailsPage = () => {
   const [error, setError] = useState("");
   const { user, loadProfile } = useAuth();
 
-  const loadBook = async () => {
-    try {
-      const data = await apiRequest(`/books/${id}`);
-      setBook(data);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
   useEffect(() => {
-    loadBook();
+    let cancelled = false;
+    const fetchBook = async () => {
+      try {
+        const data = await apiRequest(`/books/${id}`);
+        if (!cancelled) setBook(data);
+      } catch (err) {
+        if (!cancelled) setError(err.message);
+      }
+    };
+    fetchBook();
+    return () => { cancelled = true; };
   }, [id]);
 
   const handleCart = async () => {
@@ -49,7 +50,8 @@ const BookDetailsPage = () => {
       setForm({ rating: 5, comment: "" });
       setMessage("Review submitted successfully");
       setError("");
-      await loadBook();
+      const data = await apiRequest(`/books/${id}`);
+      setBook(data);
     } catch (err) {
       setError(err.message);
     }
@@ -76,8 +78,8 @@ const BookDetailsPage = () => {
           <p className="description-display" style={{ color: "var(--ink-secondary)", lineHeight: 1.7 }}>{book.description}</p>
           <div className="detail-stats">
             <strong>Tk {book.price}</strong>
-            <span>★ {(book.rating || 0).toFixed(1)} / 5</span>
-            <span>{book.numReviews} reviews</span>
+            <span>★ {(book.rating ?? 0).toFixed(1)} / 5</span>
+            <span>{book.numReviews ?? 0} reviews</span>
           </div>
           <button className="primary-button" onClick={handleCart}>Add to Cart</button>
           {message && <p style={{ color: "var(--success)", fontWeight: 500, marginTop: "0.5rem" }}>{message}</p>}

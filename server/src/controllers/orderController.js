@@ -24,6 +24,11 @@ export const createOrder = asyncHandler(async (req, res) => {
         message: `"${item.book.title}" has only ${item.book.countInStock} items in stock`
       });
     }
+    if (!item.book.image) {
+      return res.status(400).json({
+        message: `"${item.book.title}" has no image available`
+      });
+    }
   }
 
   const orderItems = user.cart.map((item) => ({

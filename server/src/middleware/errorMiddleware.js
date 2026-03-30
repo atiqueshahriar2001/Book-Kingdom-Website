@@ -23,7 +23,7 @@ export const errorHandler = (error, req, res, next) => {
     return res.status(400).json({ message: `Duplicate value for ${field}` });
   }
 
-  const statusCode = error.statusCode || res.statusCode || 500;
+  const statusCode = error.statusCode || (res.statusCode !== 200 ? res.statusCode : 500);
   return res.status(statusCode).json({
     message: error.message || "Server error",
     method: req.method,

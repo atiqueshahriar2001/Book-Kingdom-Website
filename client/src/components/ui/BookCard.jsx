@@ -15,10 +15,10 @@ const BookCard = ({ book, onWishlist, onCart, isWishlisted }) => (
       <div className="book-footer">
         <strong>Tk {book.price}</strong>
         <div className="card-actions">
-          <button onClick={() => onWishlist(book._id)}>
+          <button onClick={() => onWishlist?.(book._id)}>
             {isWishlisted ? "♥ Saved" : "Wishlist"}
           </button>
-          <button className="primary-button" onClick={() => onCart(book._id)}>Add to Cart</button>
+          <button className="primary-button" onClick={() => onCart?.(book._id)}>Add to Cart</button>
         </div>
       </div>
     </div>

@@ -11,8 +11,8 @@ const HomePage = () => {
 
   useEffect(() => {
     apiRequest("/books?featured=true&limit=4")
-      .then((data) => setFeatured(data.books))
-      .catch(() => {})
+      .then((data) => setFeatured(data.books || []))
+      .catch((err) => console.error("Failed to load featured books:", err))
       .finally(() => setLoading(false));
   }, []);
 

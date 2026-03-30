@@ -27,6 +27,9 @@ export const handleMulterError = (error, req, res, next) => {
     }
     return res.status(400).json({ message: `Upload error: ${error.message}`, path: req.originalUrl, method: req.method });
   }
+  if (error.message && (error.message.includes("Unsupported image type") || error.message.includes("File extension"))) {
+    return res.status(400).json({ message: error.message, path: req.originalUrl, method: req.method });
+  }
   next(error);
 };
 

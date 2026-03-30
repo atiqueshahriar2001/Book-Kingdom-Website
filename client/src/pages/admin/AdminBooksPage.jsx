@@ -24,7 +24,7 @@ const AdminBooksPage = () => {
 
   const loadBooks = () =>
     apiRequest("/admin/books")
-      .then((data) => setBooks(data.books))
+      .then((data) => setBooks(data.books || []))
       .catch((err) => setError(err.message));
 
   useEffect(() => {
