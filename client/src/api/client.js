@@ -1,4 +1,7 @@
-const API_URL = import.meta.env.VITE_API_URL || "https://book-kingdom-server.onrender.com/api";
+const API_URL = import.meta.env.VITE_API_URL
+  || (import.meta.env.DEV
+    ? "http://localhost:5000/api"
+    : "https://book-kingdom-server.onrender.com/api");
 
 export const apiRequest = async (path, options = {}) => {
   const token = localStorage.getItem("book-kingdom-token");

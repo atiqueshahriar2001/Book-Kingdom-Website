@@ -55,8 +55,12 @@ export const updateProfile = asyncHandler(async (req, res) => {
   }
 
   await user.save();
-  const updated = await User.findById(req.user._id).select("-password +role");
-  return res.json({ message: "Profile updated", user: updated });
+  const updated = await User.findById(req.user._id)
+    .select("-password +role")
+    .populate("wishlist")
+    .populate("cart.book");
+
+  return res.json(updated);
 });
 
 export const changePassword = asyncHandler(async (req, res) => {
