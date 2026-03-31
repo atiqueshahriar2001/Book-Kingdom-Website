@@ -16,6 +16,9 @@ const blankBook = {
 
 const AdminBooksPage = () => {
   const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
   const [form, setForm] = useState(blankBook);
   const [editingId, setEditingId] = useState("");
   const [imageFile, setImageFile] = useState(null);
@@ -24,14 +27,22 @@ const AdminBooksPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const imageRef = useRef(null);
 
-  const loadBooks = () =>
-    apiRequest("/admin/books")
-      .then((data) => setBooks(data.books || []))
-      .catch((err) => setError(err.message));
+  const loadBooks = (nextPage = page) => {
+    setLoading(true);
+    return apiRequest(`/admin/books?page=${nextPage}`)
+      .then((data) => {
+        setBooks(data.books || []);
+        setPage(data.page || nextPage);
+        setPages(data.pages || 1);
+        setError("");
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  };
 
   useEffect(() => {
-    loadBooks();
-  }, []);
+    loadBooks(page);
+  }, [page]);
 
   useEffect(() => {
     return () => {
@@ -86,7 +97,7 @@ const AdminBooksPage = () => {
       setImageFile(null);
       setImagePreview("");
       if (imageRef.current) imageRef.current.value = "";
-      await loadBooks();
+      await loadBooks(page);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -99,7 +110,7 @@ const AdminBooksPage = () => {
     setError("");
     try {
       await apiRequest(`/admin/books/${id}`, { method: "DELETE" });
-      await loadBooks();
+      await loadBooks(page);
     } catch (err) {
       setError(err.message);
     }
@@ -207,18 +218,35 @@ const AdminBooksPage = () => {
           </div>
         </form>
         <div className="stack">
-          {books.map((book) => (
-            <article className="list-card" key={book._id}>
-              <div>
-                <strong>{book.title}</strong>
-                <p>{book.author} &middot; Tk {book.price}</p>
-              </div>
-              <div className="inline-actions">
-                <button onClick={() => startEdit(book)}>Edit</button>
-                <button onClick={() => deleteBook(book._id)}>Delete</button>
-              </div>
-            </article>
-          ))}
+          {loading ? (
+            <p className="loading-state">Loading books...</p>
+          ) : books.length === 0 ? (
+            <p className="loading-state">No books to display.</p>
+          ) : (
+            <>
+              {books.map((book) => (
+                <article className="list-card" key={book._id}>
+                  <div>
+                    <strong>{book.title}</strong>
+                    <p>{book.author} &middot; Tk {book.price}</p>
+                  </div>
+                  <div className="inline-actions">
+                    <button onClick={() => startEdit(book)}>Edit</button>
+                    <button onClick={() => deleteBook(book._id)}>Delete</button>
+                  </div>
+                </article>
+              ))}
+              {pages > 1 && (
+                <div className="pagination">
+                  {Array.from({ length: pages }, (_, index) => (
+                    <button key={index + 1} onClick={() => setPage(index + 1)} disabled={page === index + 1}>
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>

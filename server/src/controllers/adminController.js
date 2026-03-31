@@ -20,6 +20,13 @@ const parseDateValue = (value, label) => {
   return parsed;
 };
 
+const ORDER_STATUS_TRANSITIONS = {
+  Pending: ["Shipped", "Cancelled"],
+  Shipped: ["Delivered", "Cancelled"],
+  Delivered: [],
+  Cancelled: []
+};
+
 export const getDashboardStats = asyncHandler(async (req, res) => {
   const { startDate, endDate } = req.query;
 
@@ -240,14 +247,50 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: `Status must be one of: ${validStatuses.join(", ")}` });
   }
 
-  const order = await Order.findById(req.params.id);
-  if (!order) {
-    return res.status(404).json({ message: "Order not found" });
-  }
+  const session = await Order.startSession();
 
-  order.status = status;
-  await order.save();
-  return res.json(order);
+  try {
+    let updatedOrder;
+
+    await session.withTransaction(async () => {
+      const order = await Order.findById(req.params.id).session(session);
+      if (!order) {
+        const error = new Error("Order not found");
+        error.statusCode = 404;
+        throw error;
+      }
+
+      if (order.status === status) {
+        updatedOrder = order;
+        return;
+      }
+
+      const allowedNextStatuses = ORDER_STATUS_TRANSITIONS[order.status] || [];
+      if (!allowedNextStatuses.includes(status)) {
+        const error = new Error(`Cannot change order status from ${order.status} to ${status}`);
+        error.statusCode = 400;
+        throw error;
+      }
+
+      if (status === "Cancelled") {
+        for (const item of order.orderItems) {
+          await Book.updateOne(
+            { _id: item.book },
+            { $inc: { countInStock: item.quantity } },
+            { session }
+          );
+        }
+      }
+
+      order.status = status;
+      await order.save({ session });
+      updatedOrder = order;
+    });
+
+    return res.json(updatedOrder);
+  } finally {
+    await session.endSession();
+  }
 });
 
 export const updateUserRole = asyncHandler(async (req, res) => {
