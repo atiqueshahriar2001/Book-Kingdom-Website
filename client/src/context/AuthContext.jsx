@@ -3,6 +3,21 @@ import { apiRequest } from "../api/client.js";
 
 const AuthContext = createContext(null);
 
+const mergeUserFromProfile = (currentUser, profile) => {
+  if (!profile) return currentUser;
+
+  return {
+    ...currentUser,
+    _id: profile._id ?? currentUser?._id,
+    name: profile.name ?? currentUser?.name,
+    email: profile.email ?? currentUser?.email,
+    phone: profile.phone ?? currentUser?.phone,
+    address: profile.address ?? currentUser?.address,
+    profilePhoto: profile.profilePhoto ?? currentUser?.profilePhoto,
+    role: profile.role ?? currentUser?.role
+  };
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
@@ -57,6 +72,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await apiRequest("/users/profile");
       setProfile(data);
+      const nextUser = mergeUserFromProfile(user, data);
+      localStorage.setItem("book-kingdom-user", JSON.stringify(nextUser));
+      setUser(nextUser);
       return data;
     } catch (error) {
       if (isAuthError(error)) {
@@ -72,7 +90,14 @@ export const AuthProvider = ({ children }) => {
     if (!user) return;
     setLoading(true);
     apiRequest("/users/profile")
-      .then((data) => setProfile(data))
+      .then((data) => {
+        setProfile(data);
+        setUser((currentUser) => {
+          const nextUser = mergeUserFromProfile(currentUser, data);
+          localStorage.setItem("book-kingdom-user", JSON.stringify(nextUser));
+          return nextUser;
+        });
+      })
       .catch((error) => {
         if (isAuthError(error)) {
           logout();

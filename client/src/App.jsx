@@ -16,6 +16,7 @@ import BooksPage from "./pages/BooksPage.jsx";
 import CartPage from "./pages/CartPage.jsx";
 import CheckoutPage from "./pages/CheckoutPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
+import NotFoundPage from "./pages/NotFoundPage.jsx";
 import WishlistPage from "./pages/WishlistPage.jsx";
 import OrdersPage from "./pages/user/OrdersPage.jsx";
 import ProfilePage from "./pages/user/ProfilePage.jsx";
@@ -57,6 +58,7 @@ const App = () => {
           <Route path="/admin/books" element={<ProtectedRoute admin><AdminLayout><AdminBooksPage /></AdminLayout></ProtectedRoute>} />
           <Route path="/admin/orders" element={<ProtectedRoute admin><AdminLayout><AdminOrdersPage /></AdminLayout></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute admin><AdminLayout><AdminUsersPage /></AdminLayout></ProtectedRoute>} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
       {!isAdminPage && <Footer />}
