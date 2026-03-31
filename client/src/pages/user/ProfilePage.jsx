@@ -165,6 +165,16 @@ const ProfilePage = () => {
         </form>
         <form className="form-card" onSubmit={changePassword}>
           <h2>Change Password</h2>
+          <input
+            type="text"
+            name="username"
+            autoComplete="username"
+            value={profile?.email || ""}
+            readOnly
+            tabIndex={-1}
+            aria-hidden="true"
+            style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: 1, height: 1 }}
+          />
           <label htmlFor="current-password">Current password</label>
           <input
             id="current-password"

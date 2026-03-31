@@ -150,16 +150,20 @@ export const validateBookQuery = [
     .optional()
     .isInt({ min: 1 })
     .withMessage("Limit must be a positive integer"),
+  query("category")
+    .optional({ values: "falsy" })
+    .isIn(["All", ...BOOK_CATEGORIES])
+    .withMessage(`Category must be one of: All, ${BOOK_CATEGORIES.join(", ")}`),
   query("rating")
-    .optional()
+    .optional({ values: "falsy" })
     .isFloat({ min: 0, max: 5 })
     .withMessage("Rating filter must be a number between 0 and 5"),
   query("minPrice")
-    .optional()
+    .optional({ values: "falsy" })
     .isFloat({ min: 0 })
     .withMessage("Minimum price must be a valid non-negative number"),
   query("maxPrice")
-    .optional()
+    .optional({ values: "falsy" })
     .isFloat({ min: 0 })
     .withMessage("Maximum price must be a valid non-negative number")
 ];

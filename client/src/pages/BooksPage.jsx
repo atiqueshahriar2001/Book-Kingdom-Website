@@ -14,6 +14,28 @@ const initialFilters = {
   rating: ""
 };
 
+const buildBookQueryParams = (filters, page = 1) => {
+  const params = new URLSearchParams();
+  const normalizedSearch = typeof filters.search === "string" ? filters.search.trim() : "";
+  if (normalizedSearch) {
+    params.set("search", normalizedSearch);
+  }
+  if (filters.category && filters.category !== "All") {
+    params.set("category", filters.category);
+  }
+  if (filters.rating !== "") {
+    params.set("rating", String(filters.rating));
+  }
+  if (filters.minPrice !== "" && !Number.isNaN(Number(filters.minPrice))) {
+    params.set("minPrice", String(filters.minPrice));
+  }
+  if (filters.maxPrice !== "" && !Number.isNaN(Number(filters.maxPrice))) {
+    params.set("maxPrice", String(filters.maxPrice));
+  }
+  params.set("page", String(page));
+  return params;
+};
+
 const BooksPage = () => {
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get("category") || "All";
@@ -27,7 +49,7 @@ const BooksPage = () => {
     setLoading(true);
     setError("");
     try {
-      const params = new URLSearchParams({ ...filters, page });
+      const params = buildBookQueryParams(filters, page);
       const result = await apiRequest(`/books?${params.toString()}`);
       setData(result);
     } catch (err) {
@@ -40,7 +62,7 @@ const BooksPage = () => {
   useEffect(() => {
     const newFilters = { ...initialFilters, category: categoryParam };
     setFilters(newFilters);
-    const params = new URLSearchParams({ ...newFilters, page: 1 });
+    const params = buildBookQueryParams(newFilters, 1);
     setLoading(true);
     setError("");
     apiRequest(`/books?${params.toString()}`)
