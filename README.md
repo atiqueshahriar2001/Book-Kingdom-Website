@@ -49,7 +49,7 @@ Book Kingdom is a MERN bookstore starter that includes:
 
 ## Security
 
-- Never commit real secrets to `.env.example`
+- Never commit real secrets to `.env`
 - If any real secret was exposed before, rotate it in the provider dashboard
 - Keep real values only in local `.env` files or hosting platform env settings
 

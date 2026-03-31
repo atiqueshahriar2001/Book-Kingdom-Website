@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../api/client.js";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -7,7 +7,16 @@ const CartPage = () => {
   const { profile, loadProfile } = useAuth();
   const cart = profile?.cart || [];
   const [error, setError] = useState("");
+  const [draftQuantities, setDraftQuantities] = useState({});
   const total = cart.reduce((sum, item) => sum + (item.book?.price || 0) * item.quantity, 0);
+
+  useEffect(() => {
+    const nextDrafts = {};
+    cart.filter((item) => item.book).forEach((item) => {
+      nextDrafts[item.book._id] = String(item.quantity);
+    });
+    setDraftQuantities(nextDrafts);
+  }, [profile?.cart]);
 
   const updateQuantity = async (bookId, quantity) => {
     setError("");
@@ -19,7 +28,39 @@ const CartPage = () => {
       await loadProfile();
     } catch (err) {
       setError(err.message);
+      setDraftQuantities((current) => ({
+        ...current,
+        [bookId]: String(cart.find((item) => item.book?._id === bookId)?.quantity ?? 1)
+      }));
     }
+  };
+
+  const handleQuantityChange = (bookId, value) => {
+    if (value === "" || /^[0-9]+$/.test(value)) {
+      setDraftQuantities((current) => ({ ...current, [bookId]: value }));
+    }
+  };
+
+  const handleQuantityCommit = async (bookId) => {
+    const rawValue = draftQuantities[bookId] ?? "";
+    if (rawValue === "") {
+      setDraftQuantities((current) => ({
+        ...current,
+        [bookId]: String(cart.find((item) => item.book?._id === bookId)?.quantity ?? 1)
+      }));
+      return;
+    }
+
+    const nextQuantity = Number(rawValue);
+    if (!Number.isInteger(nextQuantity) || nextQuantity < 1) {
+      setDraftQuantities((current) => ({
+        ...current,
+        [bookId]: String(cart.find((item) => item.book?._id === bookId)?.quantity ?? 1)
+      }));
+      return;
+    }
+
+    await updateQuantity(bookId, nextQuantity);
   };
 
   return (
@@ -48,8 +89,15 @@ const CartPage = () => {
                     name={`quantity-${item.book._id}`}
                     type="number"
                     min="1"
-                    value={item.quantity}
-                    onChange={(event) => updateQuantity(item.book._id, event.target.value)}
+                    value={draftQuantities[item.book._id] ?? String(item.quantity)}
+                    onChange={(event) => handleQuantityChange(item.book._id, event.target.value)}
+                    onBlur={() => handleQuantityCommit(item.book._id)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        handleQuantityCommit(item.book._id);
+                      }
+                    }}
                     style={{ width: "80px" }}
                     autoComplete="off"
                   />

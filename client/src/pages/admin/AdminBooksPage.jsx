@@ -158,6 +158,7 @@ const AdminBooksPage = () => {
             name="category"
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
+            required
           >
             <option value="">Select a category</option>
             {BOOK_CATEGORIES.map((category) => (
