@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { apiRequest } from "../api/client.js";
 import BookCard from "../components/ui/BookCard.jsx";
 import Dropdown from "../components/ui/Dropdown.jsx";
+import { BOOK_CATEGORIES } from "../constants/bookCategories.js";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const initialFilters = {
@@ -55,21 +56,27 @@ const BooksPage = () => {
 
   const handleWishlist = async (bookId) => {
     if (!user) return;
+    setError("");
     try {
       await apiRequest(`/users/wishlist/${bookId}`, { method: "PUT" });
       await loadProfile();
-    } catch { /* silent */ }
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const handleCart = async (bookId) => {
     if (!user) return;
+    setError("");
     try {
       await apiRequest("/users/cart", {
         method: "PUT",
-        body: JSON.stringify({ bookId, quantity: 1 })
+        body: JSON.stringify({ bookId, quantity: 1, mode: "increment" })
       });
       await loadProfile();
-    } catch { /* silent */ }
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -96,9 +103,9 @@ const BooksPage = () => {
           onChange={(event) => setFilters({ ...filters, category: event.target.value })}
         >
           <option>All</option>
-          <option>Fiction</option>
-          <option>Science</option>
-          <option>ইসলামিক</option>
+          {BOOK_CATEGORIES.map((category) => (
+            <option key={category} value={category}>{category}</option>
+          ))}
         </Dropdown>
         <input
           id="book-min-price"

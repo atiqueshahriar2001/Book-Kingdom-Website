@@ -1,16 +1,21 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { apiRequest } from "../api/client.js";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const WishlistPage = () => {
   const { profile, loadProfile } = useAuth();
-  const wishlist = profile?.wishlist || [];
+  const [error, setError] = useState("");
+  const wishlist = (profile?.wishlist || []).filter(Boolean);
 
   const toggleWishlist = async (bookId) => {
+    setError("");
     try {
       await apiRequest(`/users/wishlist/${bookId}`, { method: "PUT" });
       await loadProfile();
-    } catch { /* silent */ }
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -21,6 +26,7 @@ const WishlistPage = () => {
           <h1>My Wishlist</h1>
         </div>
       </div>
+      {error && <p className="error-text">{error}</p>}
       {wishlist.length === 0 ? (
         <p className="loading-state">Your wishlist is empty. <Link to="/books" style={{ color: "var(--accent)", fontWeight: 600 }}>Browse books</Link></p>
       ) : (

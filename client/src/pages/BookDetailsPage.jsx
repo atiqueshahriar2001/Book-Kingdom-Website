@@ -28,12 +28,18 @@ const BookDetailsPage = () => {
 
   const handleCart = async () => {
     if (!user) return;
+    setError("");
+    setMessage("");
     try {
       await apiRequest("/users/cart", {
         method: "PUT",
-        body: JSON.stringify({ bookId: id, quantity: 1 })
+        body: JSON.stringify({ bookId: id, quantity: 1, mode: "increment" })
       });
-      await loadProfile();
+      try {
+        await loadProfile();
+      } catch {
+        // Add-to-cart already succeeded; avoid showing a false failure if profile refresh is flaky.
+      }
       setMessage("Added to cart successfully");
     } catch (err) {
       setError(err.message);
@@ -42,6 +48,8 @@ const BookDetailsPage = () => {
 
   const submitReview = async (event) => {
     event.preventDefault();
+    setError("");
+    setMessage("");
     try {
       await apiRequest(`/books/${id}/reviews`, {
         method: "POST",

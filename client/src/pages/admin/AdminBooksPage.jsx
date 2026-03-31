@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { apiRequest } from "../../api/client.js";
+import Dropdown from "../../components/ui/Dropdown.jsx";
+import { BOOK_CATEGORIES } from "../../constants/bookCategories.js";
 
 const blankBook = {
   title: "",
@@ -31,9 +33,20 @@ const AdminBooksPage = () => {
     loadBooks();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (imagePreview && imageFile) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview, imageFile]);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    if (imagePreview && imageFile) {
+      URL.revokeObjectURL(imagePreview);
+    }
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
   };
@@ -42,6 +55,10 @@ const AdminBooksPage = () => {
     event.preventDefault();
     if (submitting) return;
     setError("");
+    if (!editingId && !imageFile) {
+      setError("Book cover image is required");
+      return;
+    }
     setSubmitting(true);
     try {
       const path = editingId ? `/admin/books/${editingId}` : "/admin/books";
@@ -63,6 +80,9 @@ const AdminBooksPage = () => {
       });
       setForm(blankBook);
       setEditingId("");
+      if (imagePreview && imageFile) {
+        URL.revokeObjectURL(imagePreview);
+      }
       setImageFile(null);
       setImagePreview("");
       if (imageRef.current) imageRef.current.value = "";
@@ -97,6 +117,9 @@ const AdminBooksPage = () => {
       countInStock: book.countInStock,
       featured: book.featured
     });
+    if (imagePreview && imageFile) {
+      URL.revokeObjectURL(imagePreview);
+    }
     setImageFile(null);
     setImagePreview(book.image || "");
     if (imageRef.current) imageRef.current.value = "";
@@ -105,6 +128,9 @@ const AdminBooksPage = () => {
   const cancelEdit = () => {
     setEditingId("");
     setForm(blankBook);
+    if (imagePreview && imageFile) {
+      URL.revokeObjectURL(imagePreview);
+    }
     setImageFile(null);
     setImagePreview("");
     if (imageRef.current) imageRef.current.value = "";
@@ -127,7 +153,17 @@ const AdminBooksPage = () => {
           <label htmlFor="book-author">Author</label>
           <input id="book-author" name="author" value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })} required autoComplete="off" />
           <label htmlFor="book-category">Category</label>
-          <input id="book-category" name="category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required autoComplete="off" />
+          <Dropdown
+            id="book-category"
+            name="category"
+            value={form.category}
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
+          >
+            <option value="">Select a category</option>
+            {BOOK_CATEGORIES.map((category) => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </Dropdown>
           <label htmlFor="book-image">Book Cover Image</label>
           <div className="photo-upload-area" onClick={() => imageRef.current?.click()}>
             {imagePreview ? (

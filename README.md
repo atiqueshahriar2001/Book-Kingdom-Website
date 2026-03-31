@@ -13,26 +13,45 @@ Book Kingdom is a MERN bookstore starter that includes:
 - `server` - Express API, MongoDB models, auth, business logic
 - `client` - Vite + React frontend
 
-## Quick start
+## Runtime configuration
 
-1. Install dependencies:
+- `server/.env` should use your deployed frontend origin in `CLIENT_URL`
+- `client/.env` should use your deployed backend `/api` URL in `VITE_API_URL`
+- This repository is currently configured for the deployed project:
+  - Frontend: `https://bookkingdom.netlify.app`
+  - Backend: `https://book-kingdom-server.onrender.com/api`
 
-```bash
-npm install
-```
+## Required server env vars
 
-2. Copy env files:
+- `PORT`
+- `NODE_ENV`
+- `CLIENT_URL`
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+- `SEED_ADMIN_EMAIL`
+- `SEED_ADMIN_PASSWORD`
 
-```bash
-copy server\\.env.example server\\.env
-copy client\\.env.example client\\.env
-```
+## Seed admin
 
-3. Start the app:
+- Run `cd server && npm run seed`
+- The seed script is blocked in production by design
 
-```bash
-npm run dev
-```
+## Deployment notes
+
+- Render server config lives in [server/render.yaml](/c:/Users/User/Downloads/Book-Kingdom/server/render.yaml)
+- Netlify client config lives in [client/netlify.toml](/c:/Users/User/Downloads/Book-Kingdom/client/netlify.toml)
+- On Render, make sure `CLIENT_URL` matches the deployed frontend origin exactly
+- On Netlify, set `VITE_API_URL` to your deployed backend `/api` URL
+- If you deploy from the repo root, configure Netlify base directory as `client`
+
+## Security
+
+- Never commit real secrets to `.env.example`
+- If any real secret was exposed before, rotate it in the provider dashboard
+- Keep real values only in local `.env` files or hosting platform env settings
 
 ## Default features
 

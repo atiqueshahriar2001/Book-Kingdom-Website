@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../ui/Logo.jsx";
+import { BOOK_CATEGORIES } from "../../constants/bookCategories.js";
 
 const Footer = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -32,9 +33,11 @@ const Footer = () => {
           <div className="footer-col">
             <h4>Shop</h4>
             <Link to="/books">All Books</Link>
-            <Link to="/books?category=Fiction">Fiction</Link>
-            <Link to="/books?category=Science">Science</Link>
-            <Link to="/books?category=ইসলামিক">Islamic</Link>
+            {BOOK_CATEGORIES.map((category) => (
+              <Link key={category} to={`/books?category=${encodeURIComponent(category)}`}>
+                {category === "ইসলামিক" ? "Islamic" : category}
+              </Link>
+            ))}
           </div>
           <div className="footer-col">
             <h4>Account</h4>

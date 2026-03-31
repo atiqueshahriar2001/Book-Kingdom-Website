@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import mongoose from "mongoose";
 dotenv.config();
 
 if (!process.env.NODE_ENV) {
@@ -20,8 +21,16 @@ const start = async () => {
   const shutdown = () => {
     console.log("Shutting down gracefully...");
     server.close(() => {
-      console.log("HTTP server closed.");
-      process.exit(0);
+      mongoose.connection.close(false)
+        .then(() => {
+          console.log("MongoDB connection closed.");
+          console.log("HTTP server closed.");
+          process.exit(0);
+        })
+        .catch((error) => {
+          console.error("Error closing MongoDB connection:", error);
+          process.exit(1);
+        });
     });
   };
 

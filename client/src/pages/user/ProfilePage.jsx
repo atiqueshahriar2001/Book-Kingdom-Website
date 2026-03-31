@@ -30,9 +30,20 @@ const ProfilePage = () => {
     }
   }, [profile]);
 
+  useEffect(() => {
+    return () => {
+      if (photoPreview && photoFile) {
+        URL.revokeObjectURL(photoPreview);
+      }
+    };
+  }, [photoPreview, photoFile]);
+
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    if (photoPreview && photoFile) {
+      URL.revokeObjectURL(photoPreview);
+    }
     setPhotoFile(file);
     setPhotoPreview(URL.createObjectURL(file));
   };
@@ -53,8 +64,15 @@ const ProfilePage = () => {
         method: "PUT",
         body: fd
       });
+      if (photoPreview && photoFile) {
+        URL.revokeObjectURL(photoPreview);
+      }
       setPhotoFile(null);
-      await loadProfile();
+      try {
+        await loadProfile();
+      } catch {
+        // Profile save already succeeded; avoid showing a false failure if refresh is flaky.
+      }
       setMessage("Profile updated successfully");
     } catch (err) {
       setError(err.message);

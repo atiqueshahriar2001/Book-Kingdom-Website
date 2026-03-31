@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import cors from "cors";
 import express from "express";
 import morgan from "morgan";
@@ -10,24 +11,29 @@ import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 
 const app = express();
 
-app.get("/", (req, res) => {
-  res.status(200).json({ status: "ok" });
-});
-
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
-});
+const normalizeOrigin = (origin) => origin.replace(/\/+$/, "");
 
 const allowedOrigins = [
   "https://bookkingdom.netlify.app",
-  "http://localhost:5173",
-  ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(",") : [])
-];
+  ...(process.env.CLIENT_URL
+    ? process.env.CLIENT_URL.split(",").map((origin) => origin.trim()).filter(Boolean)
+    : [])
+]
+  .map(normalizeOrigin)
+  .filter((origin, index, list) => list.indexOf(origin) === index);
+
+app.use((req, res, next) => {
+  req.requestId = randomUUID();
+  req.requestTime = new Date().toISOString();
+  res.setHeader("X-Request-Id", req.requestId);
+  next();
+});
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      const normalizedOrigin = origin ? normalizeOrigin(origin) : origin;
+      if (!normalizedOrigin || allowedOrigins.includes(normalizedOrigin)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
@@ -36,6 +42,25 @@ app.use(
     credentials: true
   })
 );
+
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    message: "Book Kingdom API is running",
+    requestId: req.requestId
+  });
+});
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    timestamp: req.requestTime,
+    requestId: req.requestId,
+    method: req.method,
+    path: req.originalUrl
+  });
+});
+
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));

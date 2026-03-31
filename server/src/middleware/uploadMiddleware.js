@@ -5,6 +5,14 @@ const storage = multer.memoryStorage();
 
 const ALLOWED_MIMETYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
+const buildErrorPayload = (req, message) => ({
+  message,
+  path: req.originalUrl,
+  method: req.method,
+  requestId: req.requestId,
+  timestamp: req.requestTime || new Date().toISOString()
+});
+
 const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 },
@@ -23,12 +31,12 @@ const upload = multer({
 export const handleMulterError = (error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     if (error.code === "LIMIT_FILE_SIZE") {
-      return res.status(400).json({ message: "File too large. Maximum size is 5MB", path: req.originalUrl, method: req.method });
+      return res.status(400).json(buildErrorPayload(req, "File too large. Maximum size is 5MB"));
     }
-    return res.status(400).json({ message: `Upload error: ${error.message}`, path: req.originalUrl, method: req.method });
+    return res.status(400).json(buildErrorPayload(req, `Upload error: ${error.message}`));
   }
   if (error.message && (error.message.includes("Unsupported image type") || error.message.includes("File extension"))) {
-    return res.status(400).json({ message: error.message, path: req.originalUrl, method: req.method });
+    return res.status(400).json(buildErrorPayload(req, error.message));
   }
   next(error);
 };
@@ -40,7 +48,7 @@ export const uploadToCloudinary = (folder) => async (req, res, next) => {
 
   const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
   if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
-    return res.status(500).json({ message: "Image upload service is not configured" });
+    return res.status(500).json(buildErrorPayload(req, "Image upload service is not configured"));
   }
 
   try {
@@ -59,7 +67,7 @@ export const uploadToCloudinary = (folder) => async (req, res, next) => {
 
     next();
   } catch (error) {
-    return res.status(500).json({ message: `File upload failed: ${error.message}` });
+    return res.status(500).json(buildErrorPayload(req, `File upload failed: ${error.message}`));
   }
 };
 

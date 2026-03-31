@@ -12,7 +12,7 @@ import {
   updateUserRole
 } from "../controllers/adminController.js";
 import { adminOnly, protect } from "../middleware/authMiddleware.js";
-import upload, { uploadToCloudinary } from "../middleware/uploadMiddleware.js";
+import upload, { uploadToCloudinary, handleMulterError } from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
@@ -27,5 +27,6 @@ router.put("/users/:id", updateUserRole);
 router.delete("/users/:id", deleteUser);
 router.get("/orders", getOrders);
 router.put("/orders/:id", updateOrderStatus);
+router.use(handleMulterError);
 
 export default router;

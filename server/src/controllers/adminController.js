@@ -1,33 +1,59 @@
 import Book from "../models/Book.js";
 import Order from "../models/Order.js";
 import User from "../models/User.js";
+import { BOOK_CATEGORIES, isValidBookCategory } from "../constants/bookCategories.js";
 import asyncHandler from "../utils/asyncHandler.js";
+
+const parsePositiveInteger = (value, fallback) => {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+const parseDateValue = (value, label) => {
+  if (!value) return null;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    const error = new Error(`${label} must be a valid date`);
+    error.statusCode = 400;
+    throw error;
+  }
+  return parsed;
+};
 
 export const getDashboardStats = asyncHandler(async (req, res) => {
   const { startDate, endDate } = req.query;
 
   const dateFilter = {};
-  if (startDate) dateFilter.$gte = new Date(startDate);
-  if (endDate) dateFilter.$lte = new Date(endDate);
+  const parsedStartDate = parseDateValue(startDate, "startDate");
+  const parsedEndDate = parseDateValue(endDate, "endDate");
+  if (parsedStartDate) dateFilter.$gte = parsedStartDate;
+  if (parsedEndDate) dateFilter.$lte = parsedEndDate;
 
-  const orderQuery = Object.keys(dateFilter).length ? { createdAt: dateFilter } : {};
+  const orderMatch = Object.keys(dateFilter).length ? { createdAt: dateFilter } : {};
 
-  const [users, books, orders] = await Promise.all([
+  const [users, books, orderAgg] = await Promise.all([
     User.countDocuments(),
     Book.countDocuments(),
-    Order.find(orderQuery)
+    Order.aggregate([
+      { $match: orderMatch },
+      { $group: { _id: null, count: { $sum: 1 }, revenue: { $sum: "$totalPrice" } } }
+    ])
   ]);
+
+  const orderStats = orderAgg[0] || { count: 0, revenue: 0 };
 
   return res.json({
     users,
     books,
-    orders: orders.length,
-    revenue: orders.reduce((sum, order) => sum + order.totalPrice, 0)
+    orders: orderStats.count,
+    revenue: orderStats.revenue
   });
 });
 
 export const getAdminBooks = asyncHandler(async (req, res) => {
   const { search = "", page = 1, limit = 10 } = req.query;
+  const pageNumber = parsePositiveInteger(page, 1);
+  const limitNumber = parsePositiveInteger(limit, 10);
 
   const query = {};
   if (search) {
@@ -38,35 +64,52 @@ export const getAdminBooks = asyncHandler(async (req, res) => {
     ];
   }
 
-  const skip = (Number(page) - 1) * Number(limit);
+  const skip = (pageNumber - 1) * limitNumber;
   const [books, total] = await Promise.all([
-    Book.find(query).sort({ createdAt: -1 }).skip(skip).limit(Number(limit)),
+    Book.find(query).sort({ createdAt: -1 }).skip(skip).limit(limitNumber),
     Book.countDocuments(query)
   ]);
 
-  return res.json({ books, total, page: Number(page), pages: Math.ceil(total / Number(limit)) });
+  return res.json({ books, total, page: pageNumber, pages: Math.max(1, Math.ceil(total / limitNumber)) });
 });
 
 export const createBook = asyncHandler(async (req, res) => {
   const { title, author, category, description, price, countInStock, featured } = req.body;
+  const normalizedTitle = typeof title === "string" ? title.trim() : "";
+  const normalizedAuthor = typeof author === "string" ? author.trim() : "";
+  const normalizedCategory = typeof category === "string" ? category.trim() : "";
+  const normalizedDescription = typeof description === "string" ? description.trim() : "";
 
-  if (!title || !author || !category || !description || price == null) {
+  if (!normalizedTitle || !normalizedAuthor || !normalizedCategory || !normalizedDescription || price == null) {
     return res.status(400).json({ message: "Title, author, category, description, and price are required" });
+  }
+  if (!isValidBookCategory(normalizedCategory)) {
+    return res.status(400).json({ message: `Category must be one of: ${BOOK_CATEGORIES.join(", ")}` });
+  }
+
+  const parsedPrice = Number(price);
+  const parsedStock = Number(countInStock ?? 0);
+  if (Number.isNaN(parsedPrice) || parsedPrice < 0) {
+    return res.status(400).json({ message: "Price must be a valid non-negative number" });
+  }
+  if (!Number.isInteger(parsedStock) || parsedStock < 0) {
+    return res.status(400).json({ message: "Stock must be a valid non-negative whole number" });
+  }
+  if (!req.file?.cloudinaryUrl) {
+    return res.status(400).json({ message: "Book cover image is required" });
   }
 
   const data = {
-    title,
-    author,
-    category,
-    description,
-    price: Number(price),
-    countInStock: Number(countInStock) || 0,
+    title: normalizedTitle,
+    author: normalizedAuthor,
+    category: normalizedCategory,
+    description: normalizedDescription,
+    price: parsedPrice,
+    countInStock: parsedStock,
     featured: featured === "true" || featured === true
   };
 
-  if (req.file?.cloudinaryUrl) {
-    data.image = req.file.cloudinaryUrl;
-  }
+  data.image = req.file.cloudinaryUrl;
 
   const book = await Book.create(data);
   return res.status(201).json(book);
@@ -80,12 +123,51 @@ export const updateBook = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Book not found" });
   }
 
-  if (title !== undefined) book.title = title;
-  if (author !== undefined) book.author = author;
-  if (category !== undefined) book.category = category;
-  if (description !== undefined) book.description = description;
-  if (price !== undefined) book.price = Number(price);
-  if (countInStock !== undefined) book.countInStock = Number(countInStock);
+  if (title !== undefined) {
+    const normalizedTitle = typeof title === "string" ? title.trim() : "";
+    if (!normalizedTitle) {
+      return res.status(400).json({ message: "Title cannot be empty" });
+    }
+    book.title = normalizedTitle;
+  }
+  if (author !== undefined) {
+    const normalizedAuthor = typeof author === "string" ? author.trim() : "";
+    if (!normalizedAuthor) {
+      return res.status(400).json({ message: "Author cannot be empty" });
+    }
+    book.author = normalizedAuthor;
+  }
+  if (category !== undefined) {
+    const normalizedCategory = typeof category === "string" ? category.trim() : "";
+    if (!normalizedCategory) {
+      return res.status(400).json({ message: "Category cannot be empty" });
+    }
+    if (!isValidBookCategory(normalizedCategory)) {
+      return res.status(400).json({ message: `Category must be one of: ${BOOK_CATEGORIES.join(", ")}` });
+    }
+    book.category = normalizedCategory;
+  }
+  if (description !== undefined) {
+    const normalizedDescription = typeof description === "string" ? description.trim() : "";
+    if (!normalizedDescription) {
+      return res.status(400).json({ message: "Description cannot be empty" });
+    }
+    book.description = normalizedDescription;
+  }
+  if (price !== undefined) {
+    const parsedPrice = Number(price);
+    if (Number.isNaN(parsedPrice) || parsedPrice < 0) {
+      return res.status(400).json({ message: "Price must be a valid non-negative number" });
+    }
+    book.price = parsedPrice;
+  }
+  if (countInStock !== undefined) {
+    const parsedStock = Number(countInStock);
+    if (!Number.isInteger(parsedStock) || parsedStock < 0) {
+      return res.status(400).json({ message: "Stock must be a valid non-negative whole number" });
+    }
+    book.countInStock = parsedStock;
+  }
   if (featured !== undefined) book.featured = featured === "true" || featured === true;
 
   if (req.file?.cloudinaryUrl) {
@@ -106,6 +188,8 @@ export const deleteBook = asyncHandler(async (req, res) => {
 
 export const getUsers = asyncHandler(async (req, res) => {
   const { search = "", role, page = 1, limit = 10 } = req.query;
+  const pageNumber = parsePositiveInteger(page, 1);
+  const limitNumber = parsePositiveInteger(limit, 10);
 
   const query = {};
   if (search) {
@@ -119,17 +203,19 @@ export const getUsers = asyncHandler(async (req, res) => {
     query.role = role;
   }
 
-  const skip = (Number(page) - 1) * Number(limit);
+  const skip = (pageNumber - 1) * limitNumber;
   const [users, total] = await Promise.all([
-    User.find(query).select("-password +role").sort({ createdAt: -1 }).skip(skip).limit(Number(limit)),
+    User.find(query).select("-password +role").sort({ createdAt: -1 }).skip(skip).limit(limitNumber),
     User.countDocuments(query)
   ]);
 
-  return res.json({ users, total, page: Number(page), pages: Math.ceil(total / Number(limit)) });
+  return res.json({ users, total, page: pageNumber, pages: Math.max(1, Math.ceil(total / limitNumber)) });
 });
 
 export const getOrders = asyncHandler(async (req, res) => {
   const { status, page = 1, limit = 10 } = req.query;
+  const pageNumber = parsePositiveInteger(page, 1);
+  const limitNumber = parsePositiveInteger(limit, 10);
 
   const query = {};
   const validStatuses = ["Pending", "Shipped", "Delivered", "Cancelled"];
@@ -137,13 +223,13 @@ export const getOrders = asyncHandler(async (req, res) => {
     query.status = status;
   }
 
-  const skip = (Number(page) - 1) * Number(limit);
+  const skip = (pageNumber - 1) * limitNumber;
   const [orders, total] = await Promise.all([
-    Order.find(query).populate("user", "name email").sort({ createdAt: -1 }).skip(skip).limit(Number(limit)),
+    Order.find(query).populate("user", "name email").sort({ createdAt: -1 }).skip(skip).limit(limitNumber),
     Order.countDocuments(query)
   ]);
 
-  return res.json({ orders, total, page: Number(page), pages: Math.ceil(total / Number(limit)) });
+  return res.json({ orders, total, page: pageNumber, pages: Math.max(1, Math.ceil(total / limitNumber)) });
 });
 
 export const updateOrderStatus = asyncHandler(async (req, res) => {

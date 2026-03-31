@@ -3,15 +3,16 @@ const API_URL = import.meta.env.VITE_API_URL || "https://book-kingdom-server.onr
 export const apiRequest = async (path, options = {}) => {
   const token = localStorage.getItem("book-kingdom-token");
   const isFormData = options.body instanceof FormData;
+  const { headers: customHeaders = {}, ...restOptions } = options;
   let response;
   try {
     response = await fetch(`${API_URL}${path}`, {
       headers: {
         ...(isFormData ? {} : { "Content-Type": "application/json" }),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...options.headers
+        ...customHeaders
       },
-      ...options
+      ...restOptions
     });
   } catch {
     throw new Error("Network error. Please check your connection.");

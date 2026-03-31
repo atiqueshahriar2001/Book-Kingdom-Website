@@ -15,6 +15,11 @@ export const AuthProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const isAuthError = useCallback((error) => {
+    const message = error?.message?.toLowerCase?.() || "";
+    return message.includes("session expired") || message.includes("not authorized");
+  }, []);
+
   const persistAuth = useCallback((payload) => {
     localStorage.setItem("book-kingdom-token", payload.token);
     localStorage.setItem("book-kingdom-user", JSON.stringify(payload.user));
@@ -53,22 +58,28 @@ export const AuthProvider = ({ children }) => {
       const data = await apiRequest("/users/profile");
       setProfile(data);
       return data;
-    } catch {
-      logout();
-      return null;
+    } catch (error) {
+      if (isAuthError(error)) {
+        logout();
+      }
+      throw error;
     } finally {
       setLoading(false);
     }
-  }, [user, logout]);
+  }, [user, logout, isAuthError]);
 
   useEffect(() => {
     if (!user) return;
     setLoading(true);
     apiRequest("/users/profile")
       .then((data) => setProfile(data))
-      .catch(() => logout())
+      .catch((error) => {
+        if (isAuthError(error)) {
+          logout();
+        }
+      })
       .finally(() => setLoading(false));
-  }, [user?._id]);
+  }, [user?._id, logout, isAuthError]);
 
   useEffect(() => {
     const handleExpired = () => {
@@ -81,7 +92,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = useMemo(
     () => ({ user, profile, loading, login, register, logout, loadProfile, setProfile }),
-    [user, profile, loading]
+    [user, profile, loading, login, register, logout, loadProfile]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

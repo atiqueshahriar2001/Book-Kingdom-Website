@@ -7,11 +7,29 @@ const AdminDashboardPage = () => {
   const [recentOrders, setRecentOrders] = useState([]);
   const [recentUsers, setRecentUsers] = useState([]);
   const [error, setError] = useState(null);
+  const [panelErrors, setPanelErrors] = useState({
+    orders: "",
+    users: ""
+  });
 
   useEffect(() => {
     apiRequest("/admin/stats").then(setStats).catch((err) => setError(err.message));
-    apiRequest("/admin/orders?limit=5").then((data) => setRecentOrders(data.orders || [])).catch(() => {});
-    apiRequest("/admin/users?limit=5").then((data) => setRecentUsers(data.users || [])).catch(() => {});
+    apiRequest("/admin/orders?limit=5")
+      .then((data) => {
+        setRecentOrders(data.orders || []);
+        setPanelErrors((current) => ({ ...current, orders: "" }));
+      })
+      .catch((err) => {
+        setPanelErrors((current) => ({ ...current, orders: err.message }));
+      });
+    apiRequest("/admin/users?limit=5")
+      .then((data) => {
+        setRecentUsers(data.users || []);
+        setPanelErrors((current) => ({ ...current, users: "" }));
+      })
+      .catch((err) => {
+        setPanelErrors((current) => ({ ...current, users: err.message }));
+      });
   }, []);
 
   if (error) return <div className="admin-page"><p className="loading-state">Error: {error}</p></div>;
@@ -89,7 +107,9 @@ const AdminDashboardPage = () => {
             <h2>Recent Orders</h2>
             <Link to="/admin/orders">View All</Link>
           </div>
-          {recentOrders.length === 0 ? (
+          {panelErrors.orders ? (
+            <p className="error-text">{panelErrors.orders}</p>
+          ) : recentOrders.length === 0 ? (
             <p className="loading-state">No orders yet.</p>
           ) : (
             <div className="admin-table">
@@ -126,7 +146,9 @@ const AdminDashboardPage = () => {
             <h2>Recent Users</h2>
             <Link to="/admin/users">View All</Link>
           </div>
-          {recentUsers.length === 0 ? (
+          {panelErrors.users ? (
+            <p className="error-text">{panelErrors.users}</p>
+          ) : recentUsers.length === 0 ? (
             <p className="loading-state">No users yet.</p>
           ) : (
             <div className="admin-user-list">

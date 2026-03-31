@@ -7,32 +7,39 @@ import { useAuth } from "../context/AuthContext.jsx";
 const HomePage = () => {
   const [featured, setFeatured] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const { profile, loadProfile, user } = useAuth();
 
   useEffect(() => {
     apiRequest("/books?featured=true&limit=4")
       .then((data) => setFeatured(data.books || []))
-      .catch((err) => console.error("Failed to load featured books:", err))
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
   const handleWishlist = async (bookId) => {
     if (!user) return;
+    setError("");
     try {
       await apiRequest(`/users/wishlist/${bookId}`, { method: "PUT" });
       await loadProfile();
-    } catch { /* silent */ }
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const handleCart = async (bookId) => {
     if (!user) return;
+    setError("");
     try {
       await apiRequest("/users/cart", {
         method: "PUT",
-        body: JSON.stringify({ bookId, quantity: 1 })
+        body: JSON.stringify({ bookId, quantity: 1, mode: "increment" })
       });
       await loadProfile();
-    } catch { /* silent */ }
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -64,6 +71,7 @@ const HomePage = () => {
           </div>
           <Link className="primary-button" to="/books">View all books &rarr;</Link>
         </div>
+        {error && <p className="error-text">{error}</p>}
         {loading ? (
           <p className="loading-state">Loading featured books...</p>
         ) : (

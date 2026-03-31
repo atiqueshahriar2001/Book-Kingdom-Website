@@ -12,7 +12,7 @@ const CheckoutPage = () => {
     address: "",
     city: "",
     postalCode: "",
-    country: ""
+    country: "Bangladesh"
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -27,7 +27,11 @@ const CheckoutPage = () => {
         method: "POST",
         body: JSON.stringify({ shippingAddress: form, paymentMethod: "Cash on Delivery" })
       });
-      await loadProfile();
+      try {
+        await loadProfile();
+      } catch {
+        // The order is already placed; don't block navigation on a profile refresh failure.
+      }
       navigate("/orders");
     } catch (err) {
       setError(err.message);

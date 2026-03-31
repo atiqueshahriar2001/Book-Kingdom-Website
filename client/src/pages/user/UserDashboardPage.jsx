@@ -7,11 +7,12 @@ const UserDashboardPage = () => {
   const { user, profile } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     apiRequest("/orders/mine")
       .then(setOrders)
-      .catch(() => {})
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
@@ -27,6 +28,7 @@ const UserDashboardPage = () => {
           <h1>Welcome, {user?.name || "User"}</h1>
         </div>
       </div>
+      {error && <p className="error-text">{error}</p>}
 
       <div className="user-dashboard-stats">
         <div className="stat-card">

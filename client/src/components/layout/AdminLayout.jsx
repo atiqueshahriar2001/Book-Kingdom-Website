@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import Logo from "../ui/Logo.jsx";
@@ -5,26 +6,36 @@ import Logo from "../ui/Logo.jsx";
 const AdminLayout = ({ children }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate("/admin/login");
   };
 
+  const closeSidebar = () => setSidebarOpen(false);
+
   return (
     <div className="admin-shell">
-      <aside className="admin-sidebar">
+      {sidebarOpen && <div className="admin-sidebar-overlay" onClick={closeSidebar} />}
+      <aside className={`admin-sidebar ${sidebarOpen ? "admin-sidebar--open" : ""}`}>
         <div className="admin-sidebar-brand">
           <Logo size={32} />
           <div className="admin-sidebar-brand-text">
             <span>Book Kingdom</span>
             <small>Admin Panel</small>
           </div>
+          <button className="admin-sidebar-close" onClick={closeSidebar}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </div>
 
         <nav className="admin-nav">
           <p className="admin-nav-label">Main</p>
-          <NavLink to="/admin" end className={({ isActive }) => `admin-nav-link ${isActive ? "active" : ""}`}>
+          <NavLink to="/admin" end className={({ isActive }) => `admin-nav-link ${isActive ? "active" : ""}`} onClick={closeSidebar}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="7" height="7" />
               <rect x="14" y="3" width="7" height="7" />
@@ -35,14 +46,14 @@ const AdminLayout = ({ children }) => {
           </NavLink>
 
           <p className="admin-nav-label">Management</p>
-          <NavLink to="/admin/books" className={({ isActive }) => `admin-nav-link ${isActive ? "active" : ""}`}>
+          <NavLink to="/admin/books" className={({ isActive }) => `admin-nav-link ${isActive ? "active" : ""}`} onClick={closeSidebar}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
             </svg>
             Books
           </NavLink>
-          <NavLink to="/admin/orders" className={({ isActive }) => `admin-nav-link ${isActive ? "active" : ""}`}>
+          <NavLink to="/admin/orders" className={({ isActive }) => `admin-nav-link ${isActive ? "active" : ""}`} onClick={closeSidebar}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
               <line x1="3" y1="6" x2="21" y2="6" />
@@ -50,7 +61,7 @@ const AdminLayout = ({ children }) => {
             </svg>
             Orders
           </NavLink>
-          <NavLink to="/admin/users" className={({ isActive }) => `admin-nav-link ${isActive ? "active" : ""}`}>
+          <NavLink to="/admin/users" className={({ isActive }) => `admin-nav-link ${isActive ? "active" : ""}`} onClick={closeSidebar}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
@@ -85,6 +96,13 @@ const AdminLayout = ({ children }) => {
       <div className="admin-main">
         <header className="admin-topbar">
           <div className="admin-topbar-left">
+            <button className="admin-hamburger" onClick={() => setSidebarOpen(true)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
             <span className="admin-badge">Admin</span>
             <span className="admin-page-title">Book Kingdom Control Panel</span>
           </div>

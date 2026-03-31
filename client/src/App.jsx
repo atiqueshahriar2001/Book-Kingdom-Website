@@ -38,7 +38,7 @@ const App = () => {
 
   return (
     <div className="app-shell">
-      {!isAdminPage && !isAdmin && <Header />}
+      {!isAdminPage && <Header />}
       <main className="main-shell">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -59,7 +59,7 @@ const App = () => {
           <Route path="/admin/users" element={<ProtectedRoute admin><AdminLayout><AdminUsersPage /></AdminLayout></ProtectedRoute>} />
         </Routes>
       </main>
-      {!isAdminPage && !isAdmin && <Footer />}
+      {!isAdminPage && <Footer />}
     </div>
   );
 };
